@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rede Adventist Health Map</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    /* Botão de acesso ao site Adventist Health */
+/* Botão “Find out more” usando imagem */
+#site-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+#site-button a {
+  display: inline-block;    /* deixa o link ajustar ao tamanho da imagem */
+  text-decoration: none;
+}
+
+#site-button img {
+  display: block;           /* remove espaços extras abaixo da imagem */
+  width: 120px;             /* ajuste conforme a largura da sua arte */
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#site-button img:hover {
+  transform: scale(1.05);   /* efeito de leve “zoom” no hover */
+}
+
+    html, body { margin:0; padding:0; height:100%; }
+    #map { width:100%; height:100%; }
+
+    /* Seletor de idioma */
+    #language-selector {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      border-radius: 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      overflow: hidden;
+      z-index: 1000;
+    }
+    #language-selector button {
+      border: none;
+      background: white;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #language-selector button:hover {
+      background: #00558C;
+    }
+    #language-selector button.selected {
+      background: #00558C;
+    }
+    #language-selector img {
+      width: 28px;
+      height: 28px;
+      display: block;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+
+  <!-- Seletor de idioma -->
+  <div id="language-selector">
+    <button id="en-btn" class="selected">
+      <img src="./images/d40624a5-eb71-421e-a17c-effa86433de9.png" alt="English">
+    </button>
+    <button id="es-btn">
+      <img src="./images/c8757546-54b6-4344-b1dd-88bc1c4dbdf3.png" alt="Español">
+    </button>
+  </div>
+
+   <div id="site-button">
+    <a href="https://adventisthealth.com.br/" target="_blank" title="Adventist Health">
+      <img src="./images/findmore.png" alt="Go to website">
+    </a>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 1) Definição dos dados
+    const locations = [
+      { en: ["Ana Stahl Adventist Clinic", "Iquitos, Peru"], es: ["Clínica Adventista Ana Stahl - Iquitos", "Iquitos, Perú"], coords: [-3.743673, -73.251632] },
+      { en: ["Juliaca Americana Adventist Clinic", "Juliaca, Puno, Peru"], es: ["Clínica Adventista Americana de Juliaca - Juliacia, Puno", "Juliacia, Puno, Perú"], coords: [-15.499687, -70.133372] },
+      { en: ["Good Hope Adventist Clinic", "Lima, Peru"], es: ["Clínica Adventista Good Hope - Lima", "Lima, Perú"], coords: [-12.046374, -77.042793] },
+      { en: ["Quito Adventist Clinic", "Quito, Ecuador"], es: ["Clínica Adventista de Quito - Quito", "Quito, Ecuador"], coords: [-0.180653, -78.467838] },
+      { en: ["Asuncion Adventist Sanitarium", "Asuncion, Paraguay"], es: ["Sanatorio Adventista de Asunción - Asunción", "Asunción, Paraguay"], coords: [-25.263739, -57.575926] },
+      { en: ["Hohenau Adventist Sanitarium", "Hohenau, Itapua, Paraguay"], es: ["Sanatorio Adventista de Hohenau - Hohenau, Itapúa", "Hohenau, Itapúa, Paraguay"], coords: [-27.060614, -55.629723] },
+      { en: ["Belgrano Adventist Sanitarium", "Buenos Aires, Argentina"], es: ["Sanatorio Adventista Belgrano - Buenos Aires", "Ciudad Autónoma de Buenos Aires, Argentina"], coords: [-34.603722, -58.381592] },
+      { en: ["River Plate Sanitarium and Hospital", "Libertador San Martin, Entre Rios, Argentina"], es: ["Sanatorio y Hospital Adventista del Plata - Libertador San Martín, Entre Ríos", "Libertador San Martín, Entre Ríos, Argentina"], coords: [-32.074286, -60.468891] },
+      { en: ["Penfigo Adventist Hospital", "Campo Grande, MS, Brazil"], es: ["Hospital Adventista Pênfigo - Campo Grande, MS", "Campo Grande, Mato Grosso del Sur, Brasil"], coords: [-20.469711, -54.620121] },
+      { en: ["Manaus Adventist Hospital", "Manaus, AM, Brazil"], es: ["Hospital Adventista de Manaus - Manaus, AM", "Manaus, Amazonas, Brasil"], coords: [-3.119028, -60.021731] },
+      { en: ["Belem Adventist Hospital", "Belem, PA, Brazil"], es: ["Hospital Adventista de Belém - Belém, PA", "Belém, Pará, Brasil"], coords: [-1.455754, -48.490179] },
+      { en: ["Sao Paulo Adventist Hospital", "Sao Paulo, SP, Brazil"], es: ["Hospital Adventista de São Paulo - São Paulo, SP", "São Paulo, São Paulo, Brasil"], coords: [-23.550520, -46.633308] },
+      { en: ["Silvestre Adventist Hospital - Rio", "Rio de Janeiro, RJ, Brazil"], es: ["Hospital Adventista Silvestre - Río de Janeiro, RJ", "Río de Janeiro, RJ, Brasil"], coords: [-22.906847, -43.172896] },
+      { en: ["Silvestre Adventist Hospital – Itaborai", "Itaborai, RJ, Brazil"], es: ["Hospital Adventista Silvestre - Itaboraí, RJ", "Itaboraí, RJ, Brasil"], coords: [-22.744045, -42.859041] },
+      { en: ["Barcarena Adventist Hospital", "Barcarena, PA, Brazil"], es: ["Hospital Adventista de Barcarena - Barcarena, PA", "Barcarena, Pará, Brasil"], coords: [-1.505417, -48.625068] },
+      { en: ["Botafogo Medical Center", "Botafogo, RJ, Brazil"], es: ["Centro Médico de Botafogo - Botafogo, RJ", "Botafogo, RJ, Brasil"], coords: [-22.952030, -43.184780] },
+      { en: ["Capão Redondo Medical Center", "Capão Redondo, SP, Brazil"], es: ["Centro Médico de Capão Redondo - Capão Redondo, SP", "Capão Redondo, SP, Brasil"], coords: [-23.681530, -46.772028] },
+      { en: ["Curitiba Medical Center", "Curitiba, PR, Brazil"], es: ["Centro Médico de Curitiba - Curitiba, PR", "Curitiba, PR, Brasil"], coords: [-25.429596, -49.271272] },
+      { en: ["Engenheiro Coelho Medical Center", "Engenheiro Coelho, SP, Brazil"], es: ["Centro Médico de Engenheiro Coelho - Engenheiro Coelho, SP", "Engenheiro Coelho, SP, Brasil"], coords: [-22.486670, -47.210487] },
+      { en: ["Porto Alegre Medical Center", "Porto Alegre, RS, Brazil"], es: ["Centro Médico de Porto Alegre - Porto Alegre, RS", "Porto Alegre, RS, Brasil"], coords: [-30.034647, -51.217659] },
+      { en: ["Vila Andrade Clinic", "Vila Andrade, SP, Brazil"], es: ["Clínica de Vila Andrade - Vila Andrade, SP", "Vila Andrade, SP, Brasil"], coords: [-23.625088, -46.735855] },
+      { en: ["Belém Clinic", "Belém, PA, Brazil"], es: ["Clínica de Belém - Belém, PA", "Belém, Pará, Brasil"], coords: [-1.455754, -48.490179] },
+      { en: ["CEVISA (Lifestyle Center)", "Engenheiro Coelho, SP, Brazil"], es: ["CEVISA (Centro de Vida Saludable) - Engenheiro Coelho, SP", "Engenheiro Coelho, SP, Brasil"], coords: [-22.486670, -47.210487] },
+      { en: ["CVS (Lifestyle Center)", "Campo Grande, MS, Brazil"], es: ["CVS (Centro de Vida Saludable) - Campo Grande, MS", "Campo Grande, Mato Grosso del Sur, Brasil"], coords: [-20.469711, -54.620121] }
+    ];
+
+    // 2) Inicializa o mapa
+    const map = L.map('map').setView([-10, -55], 4);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }
+).addTo(map);
+
+    // 3) Icon personalizado com o logo Adventist
+    const advIcon = L.icon({
+      iconUrl: './images/marca-vertical-adventist-negativo-colorido.png',
+      iconSize:   [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor:[0, -40]
+    });
+
+    // 4) Estado atual de idioma e lista de markers
+    let currentLang = 'en';
+    let markers = [];
+
+    // 5) Função para renderizar/remover markers
+    function renderMarkers() {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      locations.forEach(loc => {
+        const [name, city] = loc[currentLang];
+        const m = L.marker(loc.coords, { icon: advIcon })
+          .addTo(map)
+          .bindPopup(`<strong>${name}</strong><br>${city}`);
+        markers.push(m);
+      });
+    }
+
+    // 6) Seletor de idioma
+    document.getElementById('en-btn').addEventListener('click', () => {
+      if (currentLang === 'en') return;
+      currentLang = 'en'; updateLangButtons(); renderMarkers();
+    });
+    document.getElementById('es-btn').addEventListener('click', () => {
+      if (currentLang === 'es') return;
+      currentLang = 'es'; updateLangButtons(); renderMarkers();
+    });
+    function updateLangButtons() {
+      document.getElementById('en-btn').classList.toggle('selected', currentLang==='en');
+      document.getElementById('es-btn').classList.toggle('selected', currentLang==='es');
+    }
+
+    // 7) Desenha pela primeira vez
+    renderMarkers();
+  </script>
+</body>
+</html>
