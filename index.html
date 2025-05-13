@@ -1,145 +1,498 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Map Adventist Health SAD - Network</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Map Adventist Health SAD - Network</title>
 
-  <link rel="icon" type="image/png" href="./images/favicon.png" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="icon" type="image/png" href="./images/favicon.png" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <style>
-    html, body { margin:0; padding:0; height:100%; }
-    #map { width:100%; height:100%; }
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
 
-/* 1) Importar a fonte Work Sans */
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600&display=swap');
+      /* 1) Importar a fonte Work Sans */
+      @import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600&display=swap");
 
-/* 2) Aplicar globalmente */
-html, body {
-  font-family: 'Work Sans', sans-serif;
-  color: #00558c;
-}
+      /* 2) Aplicar globalmente */
+      html,
+      body {
+        font-family: "Work Sans", sans-serif;
+        color: #00558c;
+      }
 
-/* 3) Garantir que botões de fechar e títulos usem a mesma cor */
-#overlay-close,
-#rules-close,
-#rules-content h2 {
-  color: #00558c;
-  font-family: 'Work Sans', sans-serif;
-}
+      /* 3) Garantir que botões de fechar e títulos usem a mesma cor */
+      #overlay-close,
+      #rules-close,
+      #rules-content h2 {
+        color: #00558c;
+        font-family: "Work Sans", sans-serif;
+      }
 
+      /* Botão “Find out more” */
+      #site-button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+      #site-button img {
+        width: 120px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      #site-button img:hover {
+        transform: scale(1.05);
+      }
 
-    /* Botão “Find out more” */
-    #site-button { position:absolute; bottom:20px; right:20px; z-index:1000; }
-    #site-button img { width:120px; cursor:pointer; transition:transform 0.2s; }
-    #site-button img:hover { transform:scale(1.05); }
+      /* Seletor de idioma */
+      #language-selector {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        border-radius: 24px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        z-index: 1000;
+      }
+      #language-selector button {
+        border: none;
+        background: white;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #language-selector button:hover,
+      #language-selector button.selected {
+        background: #00558c;
+      }
+      #language-selector img {
+        width: 28px;
+        height: 28px;
+        display: block;
+        border-radius: 4px;
+      }
 
-    /* Seletor de idioma */
-    #language-selector { position:absolute; top:20px; left:50%; transform:translateX(-50%); display:flex; border-radius:24px; box-shadow:0 2px 6px rgba(0,0,0,0.3); overflow:hidden; z-index:1000; }
-    #language-selector button { border:none; background:white; padding:6px 10px; cursor:pointer; transition:background 0.2s; outline:none; display:flex; align-items:center; justify-content:center; }
-    #language-selector button:hover, #language-selector button.selected { background:#00558C; }
-    #language-selector img { width:28px; height:28px; display:block; border-radius:4px; }
+      /* FULLSCREEN OVERLAY */
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+      #overlay img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
+      #overlay-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #fff;
+        border: none;
+        font-size: 1.2rem;
+        padding: 6px 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    /* FULLSCREEN OVERLAY */
-    #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:2000; }
-    #overlay img { max-width:90%; max-height:90%; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.5); }
-    #overlay-close { position:absolute; top:20px; right:20px; background:#fff; border:none; font-size:1.2rem; padding:6px 10px; cursor:pointer; border-radius:4px; }
+      /* INITIAL RULES POPUP */
+      #rules-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+      }
+      #rules-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 400px;
+        text-align: left;
+        position: relative;
+      }
+      #rules-content h2 {
+        margin-top: 0;
+        text-align: center;
+      }
+      #rules-content ul {
+        list-style: decimal;
+        padding-left: 20px;
+        margin: 10px 0;
+      }
+      #rules-content p {
+        font-weight: bold;
+        text-align: center;
+      }
+      #rules-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
 
-    /* INITIAL RULES POPUP */
-    #rules-popup { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:3000; }
-    #rules-content { background:#fff; padding:20px; border-radius:8px; max-width:400px; text-align:left; position:relative; }
-    #rules-content h2 { margin-top:0; text-align:center}
-    #rules-content ul { list-style:decimal; padding-left:20px; margin:10px 0; }
-    #rules-content p { font-weight:bold; text-align: center;}
-    #rules-close { position:absolute; top:10px; right:10px; background:transparent; border:none; font-size:1.2rem; cursor:pointer; }
-  </style>
-</head>
-<body>
-
-  <div id="map"></div>
-
-  <div id="language-selector">
-    <button id="en-btn" class="selected"><img src="./images/d40624a5-eb71-421e-a17c-effa86433de9.png" alt="English"></button>
-    <button id="es-btn"><img src="./images/c8757546-54b6-4344-b1dd-88bc1c4dbdf3.png" alt="Español"></button>
-  </div>
-
-  <div id="site-button">
-    <a href="https://adventisthealth.com.br/" target="_blank" title="Adventist Health"><img src="./images/findmore.png" alt="Go to website"></a>
-  </div>
-
-  <!-- Fullscreen Image Overlay -->
-  <div id="overlay">
-    <button id="overlay-close">✕</button>
-    <img id="overlay-img" src="" alt="Photo Spot">
-  </div>
-
-  <!-- Initial Rules Popup -->
-  <div id="rules-popup">
-    <div id="rules-content">
-      <button id="rules-close">✕</button>
-      <h2>Stamp Earn Rules</h2>
-      <ul>
-        <li>Select a location on the map</li>
-        <li>Take a selfie</li>
-        <li>Follow @adventisthealth.br</li>
-        <li>Post your selfie and tag @adventisthealth.br</li>
-      </ul>
-      <p>Earn your stamp!</p>
+    <div id="language-selector">
+      <button id="en-btn" class="selected">
+        <img
+          src="./images/d40624a5-eb71-421e-a17c-effa86433de9.png"
+          alt="English"
+        />
+      </button>
+      <button id="es-btn">
+        <img
+          src="./images/c8757546-54b6-4344-b1dd-88bc1c4dbdf3.png"
+          alt="Español"
+        />
+      </button>
     </div>
-  </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    const locations = [
-      { en:["Ana Stahl Adventist Clinic","Iquitos, Peru"], es:["Clínica Adventista Ana Stahl - Iquitos","Iquitos, Perú"], coords:[-3.740629,-73.240969], imageUrl:"./images/ana-stahl-photo.jpg" },
-      { en:["Juliaca Americana Adventist Clinic","Juliaca, Puno, Peru"], es:["Clínica Adventista Americana de Juliacia - Juliacia, Puno","Juliacia, Puno, Perú"], coords:[-15.497708,-70.133069], imageUrl:"./images/juliaca-photo.jpg" },
-      { en:["Good Hope Adventist Clinic","Lima, Peru"], es:["Clínica Adventista Good Hope - Lima","Lima, Perú"], coords:[-12.043180,-77.028240], imageUrl:"./images/good-hope-photo.jpg" },
-      { en:["Quito Adventist Clinic","Quito, Ecuador"], es:["Clínica Adventista de Quito - Quito","Quito, Ecuador"], coords:[-0.191660,-78.493420], imageUrl:"./images/quito-photo.jpg" },
-      { en:["Asuncion Adventist Sanitarium","Asuncion, Paraguay"], es:["Sanatorio Adventista de Asunción - Asunción","Asunción, Paraguay"], coords:[-25.281300,-57.635500], imageUrl:"./images/asuncion-photo.jpg" },
-      { en:["Hohenau Adventist Sanitarium","Hohenau, Itapua, Paraguay"], es:["Sanatorio Adventista de Hohenau - Hohenau, Itapúa","Hohenau, Itapúa, Paraguay"], coords:[-27.075380,-55.640030], imageUrl:"./images/hohenau-photo.jpg" },
-      { en:["Belgrano Adventist Sanitarium","Buenos Aires, Argentina"], es:["Sanatorio Adventista Belgrano - Buenos Aires","Ciudad Autónoma de Buenos Aires, Argentina"], coords:[-34.574322,-58.468300], imageUrl:"./images/belgrano-photo.jpg" },
-      { en:["River Plate Sanitarium and Hospital","Libertador San Martin, Entre Rios, Argentina"], es:["Sanatorio y Hospital Adventista del Plata - Libertador San Martín, Entre Ríos","Libertador San Martín, Entre Ríos, Argentina"], coords:[-32.426060,-60.274757], imageUrl:"./images/river-plate-photo.jpg" },
-      { en:["Penfigo Adventist Hospital","Campo Grande, MS, Brazil"], es:["Hospital Adventista Pênfigo - Campo Grande, MS","Campo Grande, Mato Grosso del Sul, Brasil"], coords:[-20.460487,-54.604055], imageUrl:"./images/penfigo-photo.jpg" },
-      { en:["Manaus Adventist Hospital","Manaus, AM, Brazil"], es:["Hospital Adventista de Manaus - Manaus, AM","Manaus, Amazonas, Brasil"], coords:[-3.137663,-59.985229], imageUrl:"./images/manaus-photo.jpg" },
-      { en:["Belem Adventist Hospital","Belem, PA, Brazil"], es:["Hospital Adventista de Belém - Belém, PA","Belém, Pará, Brasil"], coords:[-1.435345,-48.457617], imageUrl:"./images/belem-hospital-photo.jpg" },
-      { en:["Sao Paulo Adventist Hospital","Sao Paulo, SP, Brazil"], es:["Hospital Adventista de São Paulo - São Paulo, SP","São Paulo, São Paulo, Brasil"], coords:[-23.563688,-46.634093], imageUrl:"./images/sp-hospital-photo.jpg" },
-      { en:["Silvestre Adventist Hospital - Rio","Rio de Janeiro, RJ, Brazil"], es:["Hospital Adventista Silvestre - Río de Janeiro, RJ","Río de Janeiro, RJ, Brasil"], coords:[-22.942590,-43.203500], imageUrl:"./images/silvestre-rio-photo.jpg" },
-      { en:["Silvestre Adventist Hospital – Itaborai","Itaborai, RJ, Brazil"], es:["Hospital Adventista Silvestre - Itaboraí, RJ","Itaboraí, RJ, Brasil"], coords:[-22.739700,-42.855300], imageUrl:"./images/silvestre-itaborai-photo.jpg" },
-      { en:["Barcarena Adventist Hospital","Barcarena, PA, Brazil"], es:["Hospital Adventista de Barcarena - Barcarena, PA","Barcarena, Pará, Brasil"], coords:[-1.505830,-48.625830], imageUrl:"./images/barcarena-photo.jpg" },
-      { en:["Botafogo Medical Center","Botafogo, RJ, Brazil"], es:["Centro Médico de Botafogo - Botafogo, RJ","Botafogo, RJ, Brasil"], coords:[-22.953300,-43.190000], imageUrl:"./images/botafogo-photo.jpg" },
-      { en:["Capão Redondo Medical Center","Capão Redondo, SP, Brazil"], es:["Centro Médico de Capão Redondo - Capão Redondo, SP","Capão Redondo, SP, Brasil"], coords:[-23.659251,-46.768177], imageUrl:"./images/capao-redondo-photo.jpg" },
-      { en:["Curitiba Medical Center","Curitiba, PR, Brazil"], es:["Centro Médico de Curitiba - Curitiba, PR","Curitiba, PR, Brasil"], coords:[-25.434419,-49.291992], imageUrl:"./images/curitiba-photo.jpg" },
-      { en:["Engenheiro Coelho Medical Center","Engenheiro Coelho, SP, Brazil"], es:["Centro Médico de Engenheiro Coelho - Engenheiro Coelho, SP","Engenheiro Coelho, SP, Brasil"], coords:[-22.505291,-47.180374], imageUrl:"./images/engenheiro-coelho-photo.jpg" },
-      { en:["Porto Alegre Medical Center","Porto Alegre, RS, Brazil"], es:["Centro Médico de Porto Alegre - Porto Alegre, RS","Porto Alegre, RS, Brasil"], coords:[-30.033056,-51.230000], imageUrl:"./images/porto-alegre-photo.jpg" },
-      { en:["Vila Andrade Clinic","Vila Andrade, SP, Brazil"], es:["Clínica de Vila Andrade - Vila Andrade, SP","Vila Andrade, SP, Brasil"], coords:[-23.6,-46.715278], imageUrl:"./images/vila-andrade-photo.jpg" },
-      { en:["Belém Clinic (coming)","Belém, PA, Brazil"], es:["Clínica de Belém - Belém, PA","Belém, Pará, Brasil"], coords:[-1.455754,-48.490179], imageUrl:"./images/belem-clinic-photo.jpg" },
-      { en:["CEVISA (Lifestyle Center)","Engenheiro Coelho, SP, Brazil"], es:["CEVISA (Centro de Vida Saludable) - Engenheiro Coelho, SP","Engenheiro Coelho, SP, Brasil"], coords:[-22.505708,-47.180309], imageUrl:"./images/cevisha-photo.jpg" }
-    ];
+    <div id="site-button">
+      <a
+        href="https://adventisthealth.com.br/"
+        target="_blank"
+        title="Adventist Health"
+        ><img src="./images/findmore.png" alt="Go to website"
+      /></a>
+    </div>
 
-    const map = L.map('map').setView([-10,-55],4);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:19}).addTo(map);
-    const advIcon = L.icon({ iconUrl:'./images/marca-vertical-adventist-negativo-colorido.png', iconSize:[40,40], iconAnchor:[20,40], popupAnchor:[0,-40] });
+    <!-- Fullscreen Image Overlay -->
+    <div id="overlay">
+      <button id="overlay-close">✕</button>
+      <img id="overlay-img" src="" alt="Photo Spot" />
+    </div>
 
-    let currentLang='en', markers=[];
-    function renderMarkers(){ markers.forEach(m=>map.removeLayer(m)); markers=[];
-      locations.forEach(loc=>{ const [name,city]=loc[currentLang]; const m=L.marker(loc.coords,{icon:advIcon}).addTo(map);
-        m.bindPopup(`<strong>${name}</strong><br>${city}`);
-        m.on('mouseover',()=>m.openPopup()); m.on('mouseout',()=>m.closePopup());
-        m.on('click',()=>{ document.getElementById('overlay-img').src=loc.imageUrl; document.getElementById('overlay').style.display='flex'; });
-        markers.push(m);
+    <!-- Initial Rules Popup -->
+    <div id="rules-popup">
+      <div id="rules-content">
+        <button id="rules-close">✕</button>
+        <h2>Stamp Earn Rules</h2>
+        <ul>
+          <li>Select a location on the map</li>
+          <li>Take a selfie</li>
+          <li>Follow @adventisthealth.br</li>
+          <li>Post your selfie and tag @adventisthealth.br</li>
+        </ul>
+        <p>Earn your stamp!</p>
+      </div>
+    </div>
+  
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      const locations = [
+        {
+          en: ["Ana Stahl Adventist Clinic", "Iquitos, Peru"],
+          es: ["Clínica Adventista Ana Stahl - Iquitos", "Iquitos, Perú"],
+          coords: [-3.740629, -73.240969],
+          imageUrl: "./images/ana-stahl-photo.jpg",
+        },
+        {
+          en: ["Juliaca Americana Adventist Clinic", "Juliaca, Puno, Peru"],
+          es: [
+            "Clínica Adventista Americana de Juliacia - Juliacia, Puno",
+            "Juliacia, Puno, Perú",
+          ],
+          coords: [-15.497708, -70.133069],
+          imageUrl: "./images/juliaca-photo.jpg",
+        },
+        {
+          en: ["Good Hope Adventist Clinic", "Lima, Peru"],
+          es: ["Clínica Adventista Good Hope - Lima", "Lima, Perú"],
+          coords: [-12.04318, -77.02824],
+          imageUrl: "./images/good-hope-photo.jpg",
+        },
+        {
+          en: ["Quito Adventist Clinic", "Quito, Ecuador"],
+          es: ["Clínica Adventista de Quito - Quito", "Quito, Ecuador"],
+          coords: [-0.19166, -78.49342],
+          imageUrl: "./images/quito-photo.jpg",
+        },
+        {
+          en: ["Asuncion Adventist Sanitarium", "Asuncion, Paraguay"],
+          es: [
+            "Sanatorio Adventista de Asunción - Asunción",
+            "Asunción, Paraguay",
+          ],
+          coords: [-25.2813, -57.6355],
+          imageUrl: "./images/asuncion-photo.jpg",
+        },
+        {
+          en: ["Hohenau Adventist Sanitarium", "Hohenau, Itapua, Paraguay"],
+          es: [
+            "Sanatorio Adventista de Hohenau - Hohenau, Itapúa",
+            "Hohenau, Itapúa, Paraguay",
+          ],
+          coords: [-27.07538, -55.64003],
+          imageUrl: "./images/hohenau-photo.jpg",
+        },
+        {
+          en: ["Belgrano Adventist Sanitarium", "Buenos Aires, Argentina"],
+          es: [
+            "Sanatorio Adventista Belgrano - Buenos Aires",
+            "Ciudad Autónoma de Buenos Aires, Argentina",
+          ],
+          coords: [-34.574322, -58.4683],
+          imageUrl: "./images/belgrano-photo.jpg",
+        },
+        {
+          en: [
+            "River Plate Sanitarium and Hospital",
+            "Libertador San Martin, Entre Rios, Argentina",
+          ],
+          es: [
+            "Sanatorio y Hospital Adventista del Plata - Libertador San Martín, Entre Ríos",
+            "Libertador San Martín, Entre Ríos, Argentina",
+          ],
+          coords: [-32.42606, -60.274757],
+          imageUrl: "./images/river-plate-photo.jpg",
+        },
+        {
+          en: ["Penfigo Adventist Hospital", "Campo Grande, MS, Brazil"],
+          es: [
+            "Hospital Adventista Pênfigo - Campo Grande, MS",
+            "Campo Grande, Mato Grosso del Sul, Brasil",
+          ],
+          coords: [-20.460487, -54.604055],
+          imageUrl: "./images/penfigo-photo.jpg",
+        },
+        {
+          en: ["Manaus Adventist Hospital", "Manaus, AM, Brazil"],
+          es: [
+            "Hospital Adventista de Manaus - Manaus, AM",
+            "Manaus, Amazonas, Brasil",
+          ],
+          coords: [-3.137663, -59.985229],
+          imageUrl: "./images/manaus-photo.jpg",
+        },
+        {
+          en: ["Belem Adventist Hospital", "Belem, PA, Brazil"],
+          es: [
+            "Hospital Adventista de Belém - Belém, PA",
+            "Belém, Pará, Brasil",
+          ],
+          coords: [-1.435345, -48.457617],
+          imageUrl: "./images/belem-hospital-photo.jpg",
+        },
+        {
+          en: ["Sao Paulo Adventist Hospital", "Sao Paulo, SP, Brazil"],
+          es: [
+            "Hospital Adventista de São Paulo - São Paulo, SP",
+            "São Paulo, São Paulo, Brasil",
+          ],
+          coords: [-23.563688, -46.634093],
+          imageUrl: "./images/sp-hospital-photo.jpg",
+        },
+        {
+          en: [
+            "Silvestre Adventist Hospital - Rio",
+            "Rio de Janeiro, RJ, Brazil",
+          ],
+          es: [
+            "Hospital Adventista Silvestre - Río de Janeiro, RJ",
+            "Río de Janeiro, RJ, Brasil",
+          ],
+          coords: [-22.94259, -43.2035],
+          imageUrl: "./images/silvestre-rio-photo.jpg",
+        },
+        {
+          en: [
+            "Silvestre Adventist Hospital – Itaborai",
+            "Itaborai, RJ, Brazil",
+          ],
+          es: [
+            "Hospital Adventista Silvestre - Itaboraí, RJ",
+            "Itaboraí, RJ, Brasil",
+          ],
+          coords: [-22.7397, -42.8553],
+          imageUrl: "./images/silvestre-itaborai-photo.jpg",
+        },
+        {
+          en: ["Barcarena Adventist Hospital", "Barcarena, PA, Brazil"],
+          es: [
+            "Hospital Adventista de Barcarena - Barcarena, PA",
+            "Barcarena, Pará, Brasil",
+          ],
+          coords: [-1.50583, -48.62583],
+          imageUrl: "./images/barcarena-photo.jpg",
+        },
+        {
+          en: ["Botafogo Medical Center", "Botafogo, RJ, Brazil"],
+          es: [
+            "Centro Médico de Botafogo - Botafogo, RJ",
+            "Botafogo, RJ, Brasil",
+          ],
+          coords: [-22.9533, -43.19],
+          imageUrl: "./images/botafogo-photo.jpg",
+        },
+        {
+          en: ["Capão Redondo Medical Center", "Capão Redondo, SP, Brazil"],
+          es: [
+            "Centro Médico de Capão Redondo - Capão Redondo, SP",
+            "Capão Redondo, SP, Brasil",
+          ],
+          coords: [-23.659251, -46.768177],
+          imageUrl: "./images/capao-redondo-photo.jpg",
+        },
+        {
+          en: ["Curitiba Medical Center", "Curitiba, PR, Brazil"],
+          es: [
+            "Centro Médico de Curitiba - Curitiba, PR",
+            "Curitiba, PR, Brasil",
+          ],
+          coords: [-25.434419, -49.291992],
+          imageUrl: "./images/curitiba-photo.jpg",
+        },
+        {
+          en: [
+            "Engenheiro Coelho Medical Center",
+            "Engenheiro Coelho, SP, Brazil",
+          ],
+          es: [
+            "Centro Médico de Engenheiro Coelho - Engenheiro Coelho, SP",
+            "Engenheiro Coelho, SP, Brasil",
+          ],
+          coords: [-22.505291, -47.180374],
+          imageUrl: "./images/engenheiro-coelho-photo.jpg",
+        },
+        {
+          en: ["Porto Alegre Medical Center", "Porto Alegre, RS, Brazil"],
+          es: [
+            "Centro Médico de Porto Alegre - Porto Alegre, RS",
+            "Porto Alegre, RS, Brasil",
+          ],
+          coords: [-30.033056, -51.23],
+          imageUrl: "./images/porto-alegre-photo.jpg",
+        },
+        {
+          en: ["Vila Andrade Clinic", "Vila Andrade, SP, Brazil"],
+          es: [
+            "Clínica de Vila Andrade - Vila Andrade, SP",
+            "Vila Andrade, SP, Brasil",
+          ],
+          coords: [-23.6, -46.715278],
+          imageUrl: "./images/vila-andrade-photo.jpg",
+        },
+        {
+          en: ["Belém Clinic (coming)", "Belém, PA, Brazil"],
+          es: ["Clínica de Belém - Belém, PA", "Belém, Pará, Brasil"],
+          coords: [-1.455754, -48.490179],
+          imageUrl: "./images/belem-clinic-photo.jpg",
+        },
+        {
+          en: ["CEVISA (Lifestyle Center)", "Engenheiro Coelho, SP, Brazil"],
+          es: [
+            "CEVISA (Centro de Vida Saludable) - Engenheiro Coelho, SP",
+            "Engenheiro Coelho, SP, Brasil",
+          ],
+          coords: [-22.505708, -47.180309],
+          imageUrl: "./images/cevisha-photo.jpg",
+        },
+      ];
+
+      const map = L.map("map").setView([-10, -55], 4);
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution: "&copy; OpenStreetMap &copy; CARTO",
+          subdomains: "abcd",
+          maxZoom: 19,
+        }
+      ).addTo(map);
+      const advIcon = L.icon({
+        iconUrl: "./images/marca-vertical-adventist-negativo-colorido.png",
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40],
       });
-    }
 
-    document.getElementById('en-btn').onclick=()=>{ if(currentLang!=='en'){currentLang='en';updateLangButtons();renderMarkers();}};
-    document.getElementById('es-btn').onclick=()=>{ if(currentLang!=='es'){currentLang='es';updateLangButtons();renderMarkers();}};
-    function updateLangButtons(){ document.getElementById('en-btn').classList.toggle('selected',currentLang==='en'); document.getElementById('es-btn').classList.toggle('selected',currentLang==='es'); }
+      let currentLang = "en",
+        markers = [];
+      function renderMarkers() {
+        markers.forEach((m) => map.removeLayer(m));
+        markers = [];
+        locations.forEach((loc) => {
+          const [name, city] = loc[currentLang];
+          const m = L.marker(loc.coords, { icon: advIcon }).addTo(map);
+          m.bindPopup(`<strong>${name}</strong><br>${city}`);
+          m.on("mouseover", () => m.openPopup());
+          m.on("mouseout", () => m.closePopup());
+          m.on("click", () => {
+            document.getElementById("overlay-img").src = loc.imageUrl;
+            document.getElementById("overlay").style.display = "flex";
+          });
+          markers.push(m);
+        });
+      }
 
-    document.getElementById('overlay-close').onclick=()=>{ document.getElementById('overlay').style.display='none'; };
-    document.getElementById('rules-close').onclick=()=>{ document.getElementById('rules-popup').style.display='none'; };
-    window.addEventListener('load',()=>{ document.getElementById('rules-popup').style.display='flex'; });
+      document.getElementById("en-btn").onclick = () => {
+        if (currentLang !== "en") {
+          currentLang = "en";
+          updateLangButtons();
+          renderMarkers();
+        }
+      };
+      document.getElementById("es-btn").onclick = () => {
+        if (currentLang !== "es") {
+          currentLang = "es";
+          updateLangButtons();
+          renderMarkers();
+        }
+      };
+      function updateLangButtons() {
+        document
+          .getElementById("en-btn")
+          .classList.toggle("selected", currentLang === "en");
+        document
+          .getElementById("es-btn")
+          .classList.toggle("selected", currentLang === "es");
+      }
 
-    renderMarkers();
-  </script>
-</body>
+      document.getElementById("overlay-close").onclick = () => {
+        document.getElementById("overlay").style.display = "none";
+      };
+      document.getElementById("rules-close").onclick = () => {
+        document.getElementById("rules-popup").style.display = "none";
+      };
+      window.addEventListener("load", () => {
+        document.getElementById("rules-popup").style.display = "flex";
+      });
+
+      renderMarkers();
+    </script>
+  </body>
 </html>
