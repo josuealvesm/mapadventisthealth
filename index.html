@@ -211,7 +211,7 @@
         <p>Earn your stamp!</p>
       </div>
     </div>
-  
+
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
       const locations = [
@@ -282,12 +282,15 @@
           imageUrl: "./images/river-plate-photo.jpg",
         },
         {
-          en: ["Penfigo Adventist Hospital - Head Office", "Campo Grande, MS, Brazil"],
+          en: [
+            "Penfigo Adventist Hospital - Head Office",
+            "Campo Grande, MS, Brazil",
+          ],
           es: [
             "Hospital Adventista Pênfigo - Sede",
             "Campo Grande, Mato Grosso del Sul, Brasil",
           ],
-          coords: [-20.53402, -54.66234 ],
+          coords: [-20.53402, -54.66234],
           imageUrl: "./images/penfigo-photo.jpg",
         },
         {
@@ -319,61 +322,37 @@
         },
         {
           en: ["Medical Center - South Unit", "Sao Paulo, SP, Brazil"],
-          es: [
-            "Centro Médico - Unidad Sur",
-            "São Paulo, São Paulo, Brasil",
-          ],
+          es: ["Centro Médico - Unidad Sur", "São Paulo, São Paulo, Brasil"],
           coords: [-23.6664227, -46.7830875],
           imageUrl: "./images/sp-hospital-photo.jpg",
         },
         {
-          en: [
-            "Silvestre Adventist Hospital",
-            "Rio de Janeiro, RJ, Brazil",
-          ],
-          es: [
-            "Hospital Adventista Silvestre",
-            "Río de Janeiro, RJ, Brasil",
-          ],
+          en: ["Silvestre Adventist Hospital", "Rio de Janeiro, RJ, Brazil"],
+          es: ["Hospital Adventista Silvestre", "Río de Janeiro, RJ, Brasil"],
           coords: [-22.94259, -43.2035],
           imageUrl: "./images/silvestre-rio-photo.jpg",
         },
         {
-          en: [
-            "Silvestre Adventist Hospital",
-            "Itaborai, RJ, Brazil",
-          ],
-          es: [
-            "Hospital Adventista Silvestre",
-            "Itaboraí, RJ, Brasil",
-          ],
+          en: ["Silvestre Adventist Hospital", "Itaborai, RJ, Brazil"],
+          es: ["Hospital Adventista Silvestre", "Itaboraí, RJ, Brasil"],
           coords: [-22.7397, -42.8553],
           imageUrl: "./images/silvestre-itaborai-photo.jpg",
         },
         {
           en: ["Barcarena Adventist Hospital", "Barcarena, PA, Brazil"],
-          es: [
-            "Hospital Adventista de Barcarena",
-            "Barcarena, Pará, Brasil",
-          ],
+          es: ["Hospital Adventista de Barcarena", "Barcarena, Pará, Brasil"],
           coords: [-1.50583, -48.62583],
           imageUrl: "./images/barcarena-photo.jpg",
         },
         {
           en: ["Botafogo Medical Center", "Botafogo, RJ, Brazil"],
-          es: [
-            "Centro Médico de Botafogo",
-            "Botafogo, RJ, Brasil",
-          ],
+          es: ["Centro Médico de Botafogo", "Botafogo, RJ, Brasil"],
           coords: [-22.9533, -43.19],
           imageUrl: "./images/botafogo-photo.jpg",
         },
         {
           en: ["Capão Redondo Medical Center", "Capão Redondo, SP, Brazil"],
-          es: [
-            "Centro Médico de Capão Redondo",
-            "Capão Redondo, SP, Brasil",
-          ],
+          es: ["Centro Médico de Capão Redondo", "Capão Redondo, SP, Brasil"],
           coords: [-23.659251, -46.768177],
           imageUrl: "./images/capao-redondo-photo.jpg",
         },
@@ -400,25 +379,22 @@
         },
         {
           en: ["Porto Alegre Medical Center", "Porto Alegre, RS, Brazil"],
-          es: [
-            "Centro Médico de Porto Alegre",
-            "Porto Alegre, RS, Brasil",
-          ],
+          es: ["Centro Médico de Porto Alegre", "Porto Alegre, RS, Brasil"],
           coords: [-30.033056, -51.23],
           imageUrl: "./images/porto-alegre-photo.jpg",
         },
         {
           en: ["Vila Andrade Clinic", "Vila Andrade, SP, Brazil"],
-          es: [
-            "Clínica de Vila Andrade",
-            "Vila Andrade, SP, Brasil",
-          ],
+          es: ["Clínica de Vila Andrade", "Vila Andrade, SP, Brasil"],
           coords: [-23.6, -46.715278],
           imageUrl: "./images/vila-andrade-photo.jpg",
         },
         {
           en: ["Belém Clinic (coming)", "Belém, PA, Brazil"],
-          es: ["Clínica de Belém - Belém, PA (dentro de poco)", "Belém, Pará, Brasil"],
+          es: [
+            "Clínica de Belém - Belém, PA (dentro de poco)",
+            "Belém, Pará, Brasil",
+          ],
           coords: [-1.455754, -48.490179],
           imageUrl: "./images/belem-clinic-photo.jpg",
         },
@@ -432,7 +408,10 @@
           imageUrl: "./images/cevisha-photo.jpg",
         },
         {
-          en: ["Penfigo Adventist Hospital - Downtown Unit", "Campo Grande, MS, Brazil"],
+          en: [
+            "Penfigo Adventist Hospital - Downtown Unit",
+            "Campo Grande, MS, Brazil",
+          ],
           es: [
             "Hospital Adventista Pênfigo - Unidad del centro",
             "Campo Grande, Mato Grosso del Sul, Brasil",
@@ -442,20 +421,17 @@
         },
         {
           en: ["Corporate Headquarters", "Brasilia, Brasil"],
-          es: [
-            "Sede corporativa Brasilia",
-            "Brasilia, Brasil",
-          ],
+          es: ["Sede corporativa Brasilia", "Brasilia, Brasil"],
           coords: [-15.793889, -47.882778],
           imageUrl: "./images/sede-coorporativa.jpg",
-        }
+        },
       ];
 
       const map = L.map("map").setView([-10, -55], 4);
       L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         {
-          attribution: "&copy; OpenStreetMap &copy; CARTO",
+          attribution: "&copy; OpenStreeFtMap &copy; CARTO",
           subdomains: "abcd",
           maxZoom: 19,
         }
