@@ -342,7 +342,7 @@
           en: ["Barcarena Adventist Hospital", "Barcarena, PA, Brazil"],
           es: ["Hospital Adventista de Barcarena", "Barcarena, Pará, Brasil"],
           coords: [-1.50583, -48.62583],
-          imageUrl: "./images/barcarena-photo.jpg",
+          imageUrl: "./images/barcarena-photo.png",
         },
         {
           en: ["Botafogo Medical Center", "Botafogo, RJ, Brazil"],
@@ -502,6 +502,48 @@
       });
 
       renderMarkers();
+      // === Bloco que faz o mapa “ganhar vida” sozinho ===
+let currentIdx = 0; // índice corrente na lista de locations
+
+function cycleLocations() {
+  const loc = locations[currentIdx];
+  const marker = markers[currentIdx];
+
+  // (a) centralizar e aproximar o mapa primeiro
+  //  use map.flyTo para uma transição suave; caso prefira sem animação, pode usar map.setView
+  map.flyTo(loc.coords, 8, { animate: true, duration: 2.0 });
+
+  // (b) abre a popup do marcador assim que o mapa terminar a animação de centralização
+  //    como flyTo leva ~1s, vamos colocar um pequeno delay de 1.1s antes de abrir
+  setTimeout(() => {
+    marker.openPopup();
+  }, 100);
+
+  // (c) depois de 3s (tempo extra para o usuário enxergar o popup), abre o overlay
+  setTimeout(() => {
+    document.getElementById("overlay-img").src = loc.imageUrl;
+    document.getElementById("overlay").style.display = "flex";
+
+    // (d) fechar o overlay após 10s
+    setTimeout(() => {
+      document.getElementById("overlay").style.display = "none";
+    }, 10000);
+  }, 3000);
+
+  // (e) avança para a próxima localização (com wrap-around)
+  currentIdx = (currentIdx + 1) % locations.length;
+}
+
+// Ao fechar o rules-popup, inicia o ciclo
+document.getElementById("rules-close").onclick = () => {
+  document.getElementById("rules-popup").style.display = "none";
+
+  // começa o ciclo após fechar
+  cycleLocations();
+  setInterval(cycleLocations, 15000);
+};
+
+
     </script>
   </body>
 </html>
