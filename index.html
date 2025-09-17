@@ -130,19 +130,7 @@
         border-radius: 4px;
       }
 
-      /* INITIAL RULES POPUP */
-      #rules-popup {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 3000;
-      }
+  
       #rules-content {
         background: #fff;
         padding: 20px;
@@ -227,72 +215,6 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
       const locations = [
-        {
-          en: ["Ana Stahl Adventist Clinic", "Iquitos, Peru"],
-          es: ["Clínica Adventista Ana Stahl - Iquitos", "Iquitos, Perú"],
-          coords: [-3.740629, -73.240969],
-          imageUrl: "./images/ana-stahl-photo.jpg",
-        },
-        {
-          en: ["Juliaca Americana Adventist Clinic", "Juliaca, Puno, Peru"],
-          es: [
-            "Clínica Adventista Americana de Juliacia - Juliacia, Puno",
-            "Juliacia, Puno, Perú",
-          ],
-          coords: [-15.497708, -70.133069],
-          imageUrl: "./images/juliaca-photo.jpg",
-        },
-        {
-          en: ["Good Hope Adventist Clinic", "Lima, Peru"],
-          es: ["Clínica Adventista Good Hope - Lima", "Lima, Perú"],
-          coords: [-12.04318, -77.02824],
-          imageUrl: "./images/good-hope-photo.jpg",
-        },
-        {
-          en: ["Quito Adventist Clinic", "Quito, Ecuador"],
-          es: ["Clínica Adventista de Quito - Quito", "Quito, Ecuador"],
-          coords: [-0.19166, -78.49342],
-          imageUrl: "./images/quito-photo.jpg",
-        },
-        {
-          en: ["Asuncion Adventist Sanitarium", "Asuncion, Paraguay"],
-          es: [
-            "Sanatorio Adventista de Asunción - Asunción",
-            "Asunción, Paraguay",
-          ],
-          coords: [-25.2813, -57.6355],
-          imageUrl: "./images/asuncion-photo.jpg",
-        },
-        {
-          en: ["Hohenau Adventist Sanitarium", "Hohenau, Itapua, Paraguay"],
-          es: [
-            "Sanatorio Adventista de Hohenau - Hohenau, Itapúa",
-            "Hohenau, Itapúa, Paraguay",
-          ],
-          coords: [-27.07538, -55.64003],
-          imageUrl: "./images/hohenau-photo.jpg",
-        },
-        {
-          en: ["Belgrano Adventist Sanitarium", "Buenos Aires, Argentina"],
-          es: [
-            "Sanatorio Adventista Belgrano - Buenos Aires",
-            "Ciudad Autónoma de Buenos Aires, Argentina",
-          ],
-          coords: [-34.574322, -58.4683],
-          imageUrl: "./images/belgrano-photo.jpg",
-        },
-        {
-          en: [
-            "River Plate Sanitarium and Hospital",
-            "Libertador San Martin, Entre Rios, Argentina",
-          ],
-          es: [
-            "Sanatorio y Hospital Adventista del Plata",
-            "Libertador San Martín, Entre Ríos, Argentina",
-          ],
-          coords: [-32.42606, -60.274757],
-          imageUrl: "./images/river-plate-photo.jpg",
-        },
         {
           en: [
             "Penfigo Adventist Hospital - Head Office",
@@ -437,12 +359,6 @@
           coords: [-15.793889, -47.882778],
           imageUrl: "./images/sede-coorporativa.jpg",
         },
-        {
-          en: ["Adventist Medical SPA", "São Roque, SP, Brazil"],
-          es: ["Adventist Medical SPA", "São Roque, SP, Brasil"],
-          coords: [-23.5517, -47.1293],
-          imageUrl: "./images/sao-roque.jpg",
-        },
       ];
 
       const map = L.map("map").setView([-10, -55], 4);
@@ -521,36 +437,6 @@
         renderMarkers();
       });
 
-      // === Bloco que faz o mapa “ganhar vida” sozinho ===
-      let currentIdx = 0; // índice corrente na lista de locations
-
-      function cycleLocations() {
-        const loc = locations[currentIdx];
-        const marker = markers[currentIdx];
-
-        // (a) centralizar e aproximar o mapa primeiro
-        map.flyTo(loc.coords, 8, { animate: true, duration: 2.0 });
-
-        // (b) abre a popup do marcador assim que o mapa centralizar
-        setTimeout(() => {
-          marker.openPopup();
-        }, 700);
-
-        // (c) depois de 3s (tempo extra para o usuário enxergar o popup), abre o overlay
-        setTimeout(() => {
-          const ov = document.getElementById("overlay");
-          document.getElementById("overlay-img").src = loc.imageUrl;
-          ov.classList.add("visible");
-
-          // (d) fechar o overlay após 10s
-          setTimeout(() => {
-            ov.classList.remove("visible");
-          }, 10000) ;
-        }, 3000 )
-
-        // (e) avança para a próxima localização (com wrap-around)
-        currentIdx = (currentIdx + 1) % locations.length; 
-      }
     </script>
   </body>
 </html>
